@@ -4,7 +4,7 @@ Simple .NET application to convert and merge images into pdf files
 # Goals
 
 Tools:
-- [ ] Set up a project tab
+- [x] Set up a project board
 - [ ] Set up Github Actions
 
 Programming:
