@@ -17,4 +17,8 @@
     <ProjectReference Include="..\ImageToPdf.Core\ImageToPdf.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="tests\**"  CopyToOutputDirectory="PreserveNewest"  />
+  </ItemGroup>
+
 </Project>
