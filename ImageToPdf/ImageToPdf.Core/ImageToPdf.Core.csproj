@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="kenjiuno.PdfSharp-WPF" Version="1.31.5673" />
     <PackageReference Include="MvvmCross" Version="7.0.0" />
   </ItemGroup>
 
