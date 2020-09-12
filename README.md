@@ -8,6 +8,14 @@ Tools:
 - [x] Set up Github Actions
 
 Programming:
-- [ ] Use C# in a small project
-- [ ] Use MVVM Cross to apply the MVVM architectural pattern
-- [ ] Design the graphical user interface using WPF
+- [x] Use C# in a small project
+- [x] Use MVVM Cross to apply the MVVM architectural pattern
+- [x] Design the graphical user interface using WPF
+
+
+#  Improvements
+
+- [ ] Add much more tests
+- [ ] Add error handling in the ViewModel
+- [ ] Remove duplicate code in the View.xml
+- [ ] Select and apply a coding guideline / best practice guide
