@@ -7,7 +7,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ImageToPdf.WPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Background="#FFC2CFED"
+        Title="Image to PDF converter" Width="600" Height="560">
     <Grid>
 
     </Grid>

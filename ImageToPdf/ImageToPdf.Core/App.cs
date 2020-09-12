@@ -1,4 +1,6 @@
-﻿using ImageToPdf.Core.ViewModels;
+﻿using ImageToPdf.Core.Services;
+using ImageToPdf.Core.ViewModels;
+using MvvmCross;
 using MvvmCross.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -10,7 +12,7 @@ namespace ImageToPdf.Core
     {
         public override void Initialize()
         {
-            //Mvx.IoCProvider.RegisterType<ICalculationService, CalculationService>();
+            Mvx.IoCProvider.RegisterType<IConverter, PdfConverter>();
             RegisterAppStart<ImageToPdfViewModel>();
         }
     }
