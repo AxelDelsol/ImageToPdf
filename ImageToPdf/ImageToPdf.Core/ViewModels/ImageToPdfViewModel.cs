@@ -3,11 +3,7 @@ using Microsoft.Win32;
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
 using Ookii.Dialogs.Wpf;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
-using System.Windows;
 
 namespace ImageToPdf.Core.ViewModels
 {
