@@ -50,7 +50,7 @@ namespace ImageToPdf.Core.Services
         private string GetOutputName(ImagePath img, OutputDirectory outDir)
         {
             return Path.Combine(
-                outDir.DirName,
+                outDir.DirectoryName,
                 Path.GetFileNameWithoutExtension(img.FileName) + ".pdf"
             );
         }
