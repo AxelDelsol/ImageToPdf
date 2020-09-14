@@ -13,36 +13,60 @@ namespace ImageToPdf.Core.ViewModels
 {
     public class ImageToPdfViewModel : MvxViewModel
     {
+        // Data 
+        private ObservableCollection<ImagePath> _queue = new ObservableCollection<ImagePath>();
+        private ObservableCollection<ImagePath> _done = new ObservableCollection<ImagePath>();
+
+        // Converter
         private IConverter _converter;
 
-        private ObservableCollection<ImagePath> _queue = new ObservableCollection<ImagePath>();
+        // Commands
+        private IMvxCommand _addImagesCommand;
+        private IMvxCommand _clearCommand;
+        private IMvxCommand _convertCommand;
+        private IMvxCommand _mergeCommand;
+
+
+        // Public properties
         public ObservableCollection<ImagePath> Queue
         {
             get => _queue;
-            set {
-                SetProperty(ref _queue, value);
-            }
+            set => SetProperty(ref _queue, value);
         }
 
-        private ObservableCollection<ImagePath> _done = new ObservableCollection<ImagePath>();
         public ObservableCollection<ImagePath> Done
         {
             get => _done;
-            set
-            {
-                SetProperty(ref _done, value);
-            }
+            set => SetProperty(ref _done, value);
         }
 
+        public IMvxCommand AddImagesCommand => _addImagesCommand;
+
+        public IMvxCommand ClearCommand => _clearCommand;
+
+        public IMvxCommand ConvertCommand => _convertCommand;
+
+        public IMvxCommand MergeCommand => _mergeCommand;
+
+
+        // Constructor
         public ImageToPdfViewModel(IConverter converter)
         {
+            _queue = new ObservableCollection<ImagePath>();
+            _done = new ObservableCollection<ImagePath>();
+
             _converter = converter;
+
+            _addImagesCommand = new MvxCommand(AddImages);
+            _clearCommand = new MvxCommand(Clear);
+            _convertCommand = new MvxCommand(Convert);
+            _mergeCommand = new MvxCommand(Merge);
         }
 
-
+        // Private
         private void AddImages()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog 
+            var openFileDialog = new OpenFileDialog 
             { Multiselect = true,
               Filter = "Image files(*.png; *.jpeg; *.jpg)| *.png; *.jpeg; *.jpg"
             };
@@ -52,37 +76,32 @@ namespace ImageToPdf.Core.ViewModels
                 var files = openFileDialog.FileNames;
                 foreach (var file in files)
                 {
-                    ImagePath img = new ImagePath(file);
+                    var img = new ImagePath(file);
                     _queue.Add(img);
                 }
             }
         }
-        public IMvxCommand AddImagesCommand => new MvxCommand(AddImages);
 
         private void Clear()
         {
             _queue.Clear();
             _done.Clear();
         }
-        public IMvxCommand ClearCommand => new MvxCommand(Clear);
-
+        
         private void Convert()
         {
-            string outStr = SelectDirectory();
-            OutputDirectory outDir = new OutputDirectory(outStr);
-            _converter.Convert(_queue, outDir);
+            OutputDirectory outputDirectory = SelectOutputDirectory();
+            _converter.Convert(_queue, outputDirectory);
             MoveQueueToDone();
         }
-        public IMvxCommand ConvertCommand => new MvxCommand(Convert);
-
+        
         private void Merge()
         {
-            string outStr = SelectOutputFile();
-            _converter.Merge(_queue, outStr);
+            string outputFile = SelectOutputFile();
+            _converter.Merge(_queue, outputFile);
             MoveQueueToDone();
         }
-        public IMvxCommand MergeCommand => new MvxCommand(Merge);
-
+        
         private void MoveQueueToDone()
         {
             foreach(var img in _queue)
@@ -93,18 +112,21 @@ namespace ImageToPdf.Core.ViewModels
             _queue.Clear();
         }
 
-        private string SelectDirectory()
+        private OutputDirectory SelectOutputDirectory()
         {
-            VistaFolderBrowserDialog folderDialog = new VistaFolderBrowserDialog();
+            var folderDialog = new VistaFolderBrowserDialog();
             folderDialog.ShowDialog();
-            return folderDialog.SelectedPath;
+            return new OutputDirectory(folderDialog.SelectedPath);
         }
 
         private string SelectOutputFile()
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.DefaultExt = "pdf";
-            saveFileDialog.Filter = "PDF files (*.pdf)|*.pdf|All files (*.*)|*.*";
+            var saveFileDialog = new SaveFileDialog()
+            {
+                DefaultExt = "pdf",
+                Filter = "PDF files (*.pdf)|*.pdf|All files (*.*)|*.*"
+            };
+
             saveFileDialog.ShowDialog();
             return saveFileDialog.FileName;
         }
