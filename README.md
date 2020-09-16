@@ -16,6 +16,6 @@ Programming:
 #  Improvements
 
 - [ ] Add much more tests
-- [ ] Add error handling in the ViewModel
+- [x] Add error handling in the ViewModel
 - [ ] Remove duplicate code in the View.xml
-- [ ] Select and apply a coding guideline / best practice guide
+- [x] Select and apply a coding guideline / best practice guide
