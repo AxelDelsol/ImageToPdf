@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ImageToPdf.Core.Services;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -11,32 +12,53 @@ namespace ImageToPdf.Core
     public class ImagePath
     {
         public string FileName { get; }
-        public List<string> Extensions { get; }
+        public static List<string> Extensions { get; }
 
         /// <summary>
         /// Checks that the file exists and ends with a valid extension (.jpg, .jpeg or .png).
         /// </summary>
-        /// <exception cref="System.ArgumentException">Thrown when the file does not exist or does not end with a valid extension.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when fileName is null.</exception>
+        /// <exception cref="FileNotFoundException">Thrown when fileName can not be found on the disk.</exception>
+        /// <exception cref="ArgumentException">Thrown when fileName does not have a valid extension.</exception>
         /// <param name="fileName">Path to an image.</param>
         public ImagePath(string fileName)
         {
-            Extensions = new List<String> { "jpg", "png", "jpeg" };
 
-            // TODO : Be more accurate to know what part of the filename is wrong ?
-            if (IsValid(fileName) == false)
-                throw new ArgumentException("Invalid file name");
+
+            Validate(fileName);
 
             FileName = fileName;
         }
 
-        private bool IsValid(string fileName)
+        static ImagePath()
         {
-            return fileName != null && Exists(fileName) && HasValidExtension(fileName);
+            Extensions = new List<String> { "jpg", "png", "jpeg" };
+        }
+
+        /// <summary>
+        /// Validate the input string
+        /// </summary>
+        /// <exception cref="ArgumentNullException">Thrown when fileName is null.</exception>
+        /// <exception cref="FileNotFoundException">Thrown when fileName can not be found on the disk.</exception>
+        /// <exception cref="ArgumentException">Thrown when fileName does not have a valid extension.</exception>
+        /// <param name="fileName"></param>
+        private void Validate(string fileName)
+        {
+            _ = fileName ?? throw ExceptionHelper.GetArgumentNullException();
+
+            if (Exists(fileName) == false)
+                throw ExceptionHelper.GetFileNotFoundException(fileName);
+
+            if (HasValidExtension(fileName) == false)
+                throw ExceptionHelper.GetArgumentException(fileName);
+
         }
 
         private bool HasValidExtension(string fileName)
         {
-            return Extensions.Exists(valid_ext => fileName.EndsWith(valid_ext));
+            return Extensions.Exists(
+                valid_ext => fileName.EndsWith(valid_ext, StringComparison.CurrentCultureIgnoreCase)
+            );
         }
 
         private bool Exists(string fileName)

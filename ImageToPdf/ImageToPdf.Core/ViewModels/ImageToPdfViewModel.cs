@@ -3,24 +3,21 @@ using Microsoft.Win32;
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
 using Ookii.Dialogs.Wpf;
+using System;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Windows;
 
 namespace ImageToPdf.Core.ViewModels
 {
     public class ImageToPdfViewModel : MvxViewModel
     {
         // Data 
-        private ObservableCollection<ImagePath> _queue = new ObservableCollection<ImagePath>();
-        private ObservableCollection<ImagePath> _done = new ObservableCollection<ImagePath>();
+        private ObservableCollection<ImagePath> _queue;
+        private ObservableCollection<ImagePath> _done;
 
         // Converter
-        private IConverter _converter;
-
-        // Commands
-        private IMvxCommand _addImagesCommand;
-        private IMvxCommand _clearCommand;
-        private IMvxCommand _convertCommand;
-        private IMvxCommand _mergeCommand;
+        private readonly IConverter _converter;
 
 
         // Public properties
@@ -36,44 +33,62 @@ namespace ImageToPdf.Core.ViewModels
             set => SetProperty(ref _done, value);
         }
 
-        public IMvxCommand AddImagesCommand => _addImagesCommand;
+        public IMvxCommand AddImagesCommand { get; }
 
-        public IMvxCommand ClearCommand => _clearCommand;
+        public IMvxCommand ClearCommand { get; }
 
-        public IMvxCommand ConvertCommand => _convertCommand;
+        public IMvxCommand ConvertCommand { get; }
 
-        public IMvxCommand MergeCommand => _mergeCommand;
+        public IMvxCommand MergeCommand { get; }
 
 
         // Constructor
         public ImageToPdfViewModel(IConverter converter)
         {
+            _ = converter ?? throw ExceptionHelper.GetArgumentNullException();
+
             _queue = new ObservableCollection<ImagePath>();
             _done = new ObservableCollection<ImagePath>();
 
             _converter = converter;
 
-            _addImagesCommand = new MvxCommand(AddImages);
-            _clearCommand = new MvxCommand(Clear);
-            _convertCommand = new MvxCommand(Convert);
-            _mergeCommand = new MvxCommand(Merge);
+            AddImagesCommand = new MvxCommand(AddImages);
+            ClearCommand = new MvxCommand(Clear);
+            ConvertCommand = new MvxCommand(Convert);
+            MergeCommand = new MvxCommand(Merge);
         }
 
         // Private
         private void AddImages()
         {
-            var openFileDialog = new OpenFileDialog 
-            { Multiselect = true,
-              Filter = "Image files(*.png; *.jpeg; *.jpg)| *.png; *.jpeg; *.jpg"
+            var openFileDialog = new OpenFileDialog
+            {
+                Multiselect = true,
+                Filter = "Image files(*.png; *.jpeg; *.jpg)| *.png; *.jpeg; *.jpg"
             };
-            
+
             if (openFileDialog.ShowDialog() == true)
             {
-                var files = openFileDialog.FileNames;
-                foreach (var file in files)
+                foreach (var file in openFileDialog.FileNames)
                 {
-                    var img = new ImagePath(file);
-                    _queue.Add(img);
+                    try
+                    {
+                        var img = new ImagePath(file);
+                        _queue.Add(img);
+                    }
+                    catch (ArgumentNullException e)
+                    {
+                        MessageBox.Show(e.Message);
+                    }
+                    catch (FileNotFoundException e)
+                    {
+                        MessageBox.Show($"{e.Message}.\n Please, check that the file exists.");
+                    }
+                    catch (ArgumentException e)
+                    {
+                        MessageBox.Show($"{e.Message}.\n Valid extensions : png, jpeg, jpg.");
+                    }
+
                 }
             }
         }
@@ -83,24 +98,34 @@ namespace ImageToPdf.Core.ViewModels
             _queue.Clear();
             _done.Clear();
         }
-        
+
         private void Convert()
         {
-            OutputDirectory outputDirectory = SelectOutputDirectory();
-            _converter.Convert(_queue, outputDirectory);
-            MoveQueueToDone();
+            OutputDirectory? outputDirectory = SelectOutputDirectory();
+
+            if (outputDirectory != null)
+            {
+                _converter.Convert(_queue, outputDirectory);
+                MoveQueueToDone();
+            }
+            
         }
-        
+
         private void Merge()
         {
-            string outputFile = SelectOutputFile();
-            _converter.Merge(_queue, outputFile);
-            MoveQueueToDone();
+            string? outputFile = SelectOutputFile();
+
+            if (outputFile != null)
+            {
+                _converter.Merge(_queue, outputFile);
+                MoveQueueToDone();
+            }
+            
         }
-        
+
         private void MoveQueueToDone()
         {
-            foreach(var img in _queue)
+            foreach (var img in _queue)
             {
                 _done.Add(img);
             }
@@ -108,14 +133,17 @@ namespace ImageToPdf.Core.ViewModels
             _queue.Clear();
         }
 
-        private OutputDirectory SelectOutputDirectory()
+        private OutputDirectory? SelectOutputDirectory()
         {
             var folderDialog = new VistaFolderBrowserDialog();
-            folderDialog.ShowDialog();
-            return new OutputDirectory(folderDialog.SelectedPath);
+
+            if (folderDialog.ShowDialog() == true)
+                return new OutputDirectory(folderDialog.SelectedPath);
+
+            return null;
         }
 
-        private string SelectOutputFile()
+        private string? SelectOutputFile()
         {
             var saveFileDialog = new SaveFileDialog()
             {
@@ -123,8 +151,10 @@ namespace ImageToPdf.Core.ViewModels
                 Filter = "PDF files (*.pdf)|*.pdf|All files (*.*)|*.*"
             };
 
-            saveFileDialog.ShowDialog();
-            return saveFileDialog.FileName;
+            if (saveFileDialog.ShowDialog() == true)
+                return saveFileDialog.FileName;
+
+            return null;
         }
     }
 }

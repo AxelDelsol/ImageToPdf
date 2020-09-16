@@ -59,7 +59,7 @@ namespace ImageToPdf.Tests
         {
             string testDir = null;
 
-            Assert.Throws<DirectoryNotFoundException>(() =>
+            Assert.Throws<ArgumentNullException>(() =>
             {
                 var dir = new OutputDirectory(testDir);
             });
