@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace ImageToPdf.Core.Services
 {
@@ -13,14 +14,28 @@ namespace ImageToPdf.Core.Services
         /// <summary>
         /// Checks that the directory exists.
         /// </summary>
+        /// <exception cref="ArgumentNullException">Thrown when directoryName is null.</exception>
         /// <exception cref="System.IO.DirectoryNotFoundException">Thrown when the directory does not exist.</exception>
         /// <param name="directoryName">Path of the directory</param>
         public OutputDirectory(string directoryName)
         {
-            if (Directory.Exists(directoryName) == false)
-                throw new DirectoryNotFoundException("Invalid filename");
+            Validate(directoryName);
 
             DirectoryName = directoryName;
+        }
+
+        /// <summary>
+        /// Validate the input string
+        /// </summary>
+        /// <exception cref="ArgumentNullException">Thrown when directoryName is null.</exception>
+        /// <exception cref="System.IO.DirectoryNotFoundException">Thrown when the directory does not exist.</exception>
+        /// <param name="directoryName"></param>
+        private void Validate(string directoryName)
+        {
+            _ = directoryName ?? throw ExceptionHelper.GetArgumentNullException();
+
+            if (Directory.Exists(directoryName) == false)
+                throw ExceptionHelper.GetDirectoryNotFoundException(directoryName);
         }
     }
 }
