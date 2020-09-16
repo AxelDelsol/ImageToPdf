@@ -10,7 +10,7 @@ namespace ImageToPdf.Tests
         [Fact]
         public void ConstructorSuccessJpgTest()
         {
-            var testFile = new string(Path.Combine("tests", "imagePathData", "best_girl.jpg"));
+            var testFile = Path.Combine("tests", "imagePathData", "best_girl.jpg");
             // If the construction fails, it throws and stops the test
             var img = new ImagePath(testFile);
         }
@@ -18,7 +18,7 @@ namespace ImageToPdf.Tests
         [Fact]
         public void ConstructorSuccessPngTest()
         {
-            var testFile = new string(Path.Combine("tests", "imagePathData", "cat.png"));
+            var testFile = Path.Combine("tests", "imagePathData", "cat.png");
             // If the construction fails, it throws and stops the test
             var img = new ImagePath(testFile);
         }
@@ -26,7 +26,7 @@ namespace ImageToPdf.Tests
         [Fact]
         public void ConstructorSuccessJpegTest()
         {
-            var testFile = new string(Path.Combine("tests", "imagePathData", "cat.jpeg"));
+            var testFile = Path.Combine("tests", "imagePathData", "cat.jpeg");
             // If the construction fails, it throws and stops the test
             var img = new ImagePath(testFile);
         }
@@ -34,7 +34,7 @@ namespace ImageToPdf.Tests
         [Fact]
         public void ConstructorFailExtensionTest()
         {
-            var testFile = new string(Path.Combine("tests", "test_folder", "file.txt"));
+            var testFile = Path.Combine("tests", "test_folder", "file.txt");
             Assert.Throws<ArgumentException>(() =>
                 {
                     ImagePath img = new ImagePath(testFile);
@@ -45,8 +45,19 @@ namespace ImageToPdf.Tests
         [Fact]
         public void ConstructorFailFileDoesNotExistTest()
         {
-            var testFile = new string(Path.Combine("tests", "test_folder", "unknown"));
-            Assert.Throws<ArgumentException>(() =>
+            var testFile = Path.Combine("tests", "test_folder", "unknown");
+            Assert.Throws<FileNotFoundException>(() =>
+            {
+                ImagePath img = new ImagePath(testFile);
+            }
+                );
+        }
+
+        [Fact]
+        public void ConstructorFailnull()
+        {
+            string testFile = null;
+            Assert.Throws<ArgumentNullException>(() =>
             {
                 ImagePath img = new ImagePath(testFile);
             }
