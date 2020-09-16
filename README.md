@@ -1,4 +1,4 @@
-![example workflow name](https://github.com/AxelDelsol/ImageToPdf/actions/workflows/Build/badge.svg)
+![](https://github.com/AxelDelsol/ImageToPdf/workflows/.NET%20Core/badge.svg)
 
 # ImageToPdf
 Simple .NET application to convert and merge images into pdf files
