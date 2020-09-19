@@ -8,6 +8,7 @@
         xmlns:local="clr-namespace:ImageToPdf.WPF"
         mc:Ignorable="d"
         Background="#FFC2CFED"
+        ResizeMode="NoResize"
         Title="Image to PDF converter" Width="600" Height="560">
     <Grid>
 
